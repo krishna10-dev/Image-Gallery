@@ -1,223 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Gallery</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+    <title>Responsive Image Gallery</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap");
+
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #eee;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        header {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        header a {
+            color: #eee;
+            margin-right: 10px;
+            padding: 5px 10px;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        a.active, header a:hover {
+            background: #14ff72cb;
+            border-radius: 5px;
+            color: white;
+        }
+
+        /* slider section */
+        .slider {
+            height: 100vh;
+            margin-top: -50px;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slider .list .item {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0 0 0 0;
+        }
+
+        .slider .list .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider .list .item .content {
+            position: absolute;
+            top: 15%; /* Moved content up */
+            width: 90%;
+            max-width: 800px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding-right: 0;
+            box-sizing: border-box;
+            color: #fff;
+            text-shadow: 0 5px 10px #0004;
+        }
+        
+        .slider .list .item .content .description {
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker for better readability */
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .slider .list .item .content .title,
+        .slider .list .item .content .type {
+            font-size: clamp(2.5rem, 8vw, 5em);
+            font-weight: bold;
+            line-height: 1.3em;
+        }
+
+        .slider .list .item .type {
+            color: #14ff72e0;
+        }
+
+        .slider .list .item .button {
+            display: grid;
+            grid-template-columns: repeat(2, 130px);
+            grid-template-rows: 40px;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .slider .list .item .button a {
+            border: none;
+            background-color: #eee;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            transition: 0.4s;
+            letter-spacing: 2px;
+            text-decoration: none;
+            padding: 10px 0;
+            color: black;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .slider .list .item .button a:nth-child(2) {
+            background-color: transparent;
+            border: 1px solid #fff;
+            color: #eee;
+        }
+
+        /* Thumbnail Section */
+        .thumbnail {
+            position: absolute;
+            bottom: 30px; /* Adjusted position */
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: 490px; /* Limit to 3 thumbnails */
+            overflow: hidden; /* Hide other thumbnails */
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+        }
+
+        .thumbnail .item {
+            width: 150px;
+            height: 220px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .thumbnail .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* nextPrevArrows Section */
+        .nextPrevArrows {
+            position: absolute;
+            top: auto;
+            bottom: 130px; /* Positioned above thumbnails */
+            right: 67%;
+            transform: translateX(150px);
+            z-index: 100;
+            width: 300px;
+            max-width: 90%;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nextPrevArrows button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #14ff72cb;
+            border: none;
+            color: #fff;
+            font-family: monospace;
+            font-weight: bold;
+            transition: 0.5s;
+            cursor: pointer;
+        }
+
+        .nextPrevArrows button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        /* Animation Part */
+        .slider .list .item:nth-child(1) {
+            z-index: 1;
+        }
+
+        .slider .list .item:nth-child(1) .content .title,
+        .slider .list .item:nth-child(1) .content .type,
+        .slider .list .item:nth-child(1) .content .description,
+        .slider .list .item:nth-child(1) .content .button {
+            transform: translateY(50px);
+            filter: blur(20px);
+            opacity: 0;
+            animation: showContent 0.5s 1s linear 1 forwards;
+        }
+
+        @keyframes showContent {
+            to {
+                transform: translateY(0px);
+                filter: blur(0px);
+                opacity: 1;
+            }
+        }
+
+        .slider .list .item:nth-child(1) .content .title {
+            animation-delay: 0.4s !important;
+        }
+
+        .slider .list .item:nth-child(1) .content .type {
+            animation-delay: 0.6s !important;
+        }
+
+        .slider .list .item:nth-child(1) .content .description {
+            animation-delay: 0.8s !important;
+        }
+
+        .slider .list .item:nth-child(1) .content .button {
+            animation-delay: 1s !important;
+        }
+
+        /* Animation for next button click */
+        .slider.next .list .item:nth-child(1) img {
+            width: 150px;
+            height: 220px;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            border-radius: 30px;
+            animation: showImage 0.5s linear 1 forwards;
+        }
+
+        @keyframes showImage {
+            to {
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+        }
+
+        .slider.next .thumbnail .item:nth-last-child(1) {
+            overflow: hidden;
+            animation: showThumbnail 0.5s linear 1 forwards;
+        }
+
+        .slider.prev .list .item img {
+            z-index: 100;
+        }
+
+        @keyframes showThumbnail {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+        }
+
+        .slider.next .thumbnail {
+            animation: effectNext 0.5s linear 1 forwards;
+        }
+
+        @keyframes effectNext {
+            from {
+                transform: translateX(150px);
+            }
+        }
+
+        /* Animation for prev button click */
+        .slider.prev .list .item:nth-child(2) {
+            z-index: 2;
+        }
+
+        .slider.prev .list .item:nth-child(2) img {
+            animation: outFrame 0.5s linear 1 forwards;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        @keyframes outFrame {
+            to {
+                width: 150px;
+                height: 220px;
+                bottom: 50px;
+                left: 50%;
+                border-radius: 20px;
+            }
+        }
+
+        .slider.prev .thumbnail .item:nth-child(1) {
+            overflow: hidden;
+            opacity: 0;
+            animation: showThumbnail 0.5s linear 1 forwards;
+        }
+
+        .slider.next .nextPrevArrows button,
+        .slider.prev .nextPrevArrows button {
+            pointer-events: none;
+        }
+
+        .slider.prev .list .item:nth-child(2) .content .title,
+        .slider.prev .list .item:nth-child(2) .content .type,
+        .slider.prev .list .item:nth-child(2) .content .description,
+        .slider.prev .list .item:nth-child(2) .content .button {
+            animation: contentOut 1.5s linear 1 forwards !important;
+        }
+
+        @keyframes contentOut {
+            to {
+                transform: translateY(-150px);
+                filter: blur(20px);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 1024px) {
+            .slider .list .item .content {
+                padding-right: 0;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .slider .list .item .content {
+                padding-right: 0;
+                top: 15%;
+            }
+
+            .thumbnail {
+                gap: 10px;
+                max-width: 320px; /* for 3 smaller items */
+                overflow: hidden;
+            }
+            .thumbnail .item {
+                width: 100px;
+                height: 150px;
+            }
+            .nextPrevArrows {
+                top: auto;
+                bottom: 80px; /* Adjusted for smaller thumbnails */
+                right: 67%;
+                transform: translateX(100px);
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .thumbnail {
+                display: none;
+            }
+            .nextPrevArrows {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+                width: 90%;
+                justify-content: space-between;
+            }
+            .nextPrevArrows button {
+                width: 50px;
+                height: 50px;
+            }
+            .slider .list .item .content {
+                text-align: center;
+            }
+            .slider .list .item .button {
+                grid-template-columns: 1fr;
+                margin: 20px auto 0;
+                width: 130px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
     <header>
-      <nav>
-        <a href="#" class="active">Home</a>
-        <a href="#">About</a>
-      </nav>
+        <nav>
+            <a href="#" class="active">Home</a>
+            <a href="#">About</a>
+        </nav>
     </header>
 
     <div class="slider">
-      <div class="list">
-        <div class="item">
-          <img src="Images/heliconia-8599119.jpg" alt="" />
+        <div class="list">
+            <div class="item">
+                <img src="Images/heliconia-8599119.jpg" alt="Heliconia flower" />
+                <div class="content">
+                    <div class="title">Heliconia</div>
+                    <div class="type">FLOWER</div>
+                    <div class="description">
+                        Heliconia is a genus of flowering plants. Most of the 194 known species are native to the
+                        tropical Americas, but a few are indigenous to certain islands of the western Pacific and Maluku
+                        in Indonesia.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Heliconia">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
 
-          <div class="content">
-            <div class="title">Heliconia</div>
-            <div class="type">FLOWER</div>
-            <div class="description">
-              Heliconia is a genus of flowering plants in the monotypic family
-              Heliconiaceae. Most of the 194 known species are native to the
-              tropical Americas, but a few are indigenous to certain islands of
-              the western Pacific and Maluku in Indonesia. Many species of
-              Heliconia are found in the tropical forests of these regions.
+            <div class="item">
+                <img src="Images/hills-615429.jpg" alt="Rolling green hills" />
+                <div class="content">
+                    <div class="title">Hills</div>
+                    <div class="type">NATURE</div>
+                    <div class="description">
+                        A hill is a landform that extends above the surrounding terrain.
+                        It often has a distinct summit, and is usually applied to peaks
+                        which are above elevation compared to the relative landmass.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Hill">SEE MORE</a>
+                    </div>
+                </div>
             </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Heliconia">SEE MORE</a>
+
+            <div class="item">
+                <img src="Images/mountain-7704596.jpg" alt="Snow covered mountain" />
+                <div class="content">
+                    <div class="title">Ice-Mountain</div>
+                    <div class="type">MOUNTAINS</div>
+                    <div class="description">
+                        Ice Mountain is a mountain ridge and algific talus slope that is
+                        part of a 149-acre (60 ha) preserve near the community of North
+                        River Mills in Hampshire County, West Virginia, United States.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Ice_Mountain">SEE MORE</a>
+                    </div>
+                </div>
             </div>
-          </div>
+            
+             <div class="item">
+                <img src="Images/mountains-6721870.jpg" alt="Green mountain valley" />
+                <div class="content">
+                    <div class="title">Green-Mountain</div>
+                    <div class="type">MOUNTAINS</div>
+                    <div class="description">
+                        Green Mountain is a common name for "The Peak", the highest point and a stratovolcano on
+                        Ascension Island, which has gained some fame for claims that it is one of very few large-scale
+                        artificial forests.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Green_Mountain">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="Images/mountains-7302806.jpg" alt="Mountain peak in clouds" />
+                <div class="content">
+                    <div class="title">Peak-Mountains</div>
+                    <div class="type">MOUNTAINS</div>
+                    <div class="description">
+                        A summit is a point on a surface that is higher in elevation than
+                        all points immediately adjacent to it. The topographic terms acme,
+                        apex, peak (mountain peak), and zenith are synonymous.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/List_of_highest_mountains_on_Earth">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item">
+                <img src="Images/railroad-163518_1920.jpg" alt="Railroad track in a field" />
+                <div class="content">
+                    <div class="title">Rail-Road</div>
+                    <div class="type">NATURE</div>
+                    <div class="description">
+                        A railway track or railroad track, also known as a train track or permanent way, is the
+                        structure on a railway or railroad consisting of the rails, fasteners, railroad ties and
+                        ballast, plus the underlying subgrade.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Rail_Road_Flat,_California">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="Images/road-7504719.jpg" alt="Winding road in the mountains" />
+                <div class="content">
+                    <div class="title">Mountain-Roads</div>
+                    <div class="type">MOUNTAINS</div>
+                    <div class="description">
+                        A mountain pass is a navigable route through a mountain range or over a ridge. Since mountain
+                        ranges can present formidable barriers to travel, passes have played a key role in trade, war,
+                        and migration.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/San_Gabriel_Dam">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="Images/sea-7375377.jpg" alt="Cliffs by the sea" />
+                <div class="content">
+                    <div class="title">Sea</div>
+                    <div class="type">NATURE</div>
+                    <div class="description">
+                        A sea is a large body of salty water. There are particular seas and the sea. The sea commonly
+                        refers to the ocean, the wider body of seawater.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Sea">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="Images/tree-832079_1920.jpg" alt="Solitary tree on a hill" />
+                <div class="content">
+                    <div class="title">Tree</div>
+                    <div class="type">NATURE</div>
+                    <div class="description">
+                        A tree is a perennial plant with an elongated stem, or trunk, usually supporting branches and
+                        leaves. In some usages, the definition of a tree may be narrower, including only woody plants.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Tree">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <img src="Images/tree-7739243.jpg" alt="Small house and tree in a field" />
+                <div class="content">
+                    <div class="title">Mountain-House</div>
+                    <div class="type">MOUNTAINS</div>
+                    <div class="description">
+                        The Mountain House is a restaurant located in King's Mountain, Woodside, California. Initially
+                        established over a century ago hosting a variety of community roles.
+                    </div>
+                    <div class="button">
+                        <a href="https://en.wikipedia.org/wiki/Mountain_House">SEE MORE</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="item">
-          <img src="Images/hills-615429.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Hills</div>
-            <div class="type">NATURE</div>
-            <div class="description">
-              A hill is a landform that extends above the surrounding terrain.
-              It often has a distinct summit, and is usually applied to peaks
-              which are above elevation compared to the relative landmass,
-              though not as prominent as mountains.
+        <div class="thumbnail">
+            <div class="item">
+                <img src="Images/heliconia-8599119.jpg" alt="Heliconia thumbnail" />
             </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Hill">SEE MORE</a>
+            <div class="item">
+                <img src="Images/hills-615429.jpg" alt="Hills thumbnail" />
             </div>
-          </div>
-        </div>
-
-        <div class="item">
-          <img src="Images/mountain-7704596.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Ice-Mountain</div>
-            <div class="type">MOUNTAINS</div>
-            <div class="description">
-              Ice Mountain is a mountain ridge and algific talus slope that is
-              part of a 149-acre (60 ha) preserve near the community of North
-              River Mills in Hampshire County, West Virginia, United States. It
-              was designated a National Natural Landmark in 2012.Ice Mountain is
-              protected by The Nature Conservancy and open for visits by small
-              groups of hikers.
+            <div class="item">
+                <img src="Images/mountain-7704596.jpg" alt="Ice mountain thumbnail" />
             </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Ice_Mountain">SEE MORE</a>
+            <div class="item">
+                <img src="Images/mountains-6721870.jpg" alt="Green mountain thumbnail" />
             </div>
-          </div>
+            <div class="item">
+                <img src="Images/mountains-7302806.jpg" alt="Peak mountains thumbnail" />
+            </div>
+            <div class="item">
+                <img src="Images/railroad-163518_1920.jpg" alt="Railroad thumbnail" />
+            </div>
+            <div class="item">
+                <img src="Images/road-7504719.jpg" alt="Mountain road thumbnail" />
+            </div>
+            <div class="item">
+                <img src="Images/sea-7375377.jpg" alt="Sea thumbnail" />
+            </div>
+            <div class="item">
+                <img src="Images/tree-832079_1920.jpg" alt="Tree thumbnail" />
+            </div>
+            <div class="item">
+                <img src="Images/tree-7739243.jpg" alt="Mountain house thumbnail" />
+            </div>
         </div>
 
-        <div class="item">
-          <img src="Images/mountains-6721870.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Green-Mountain</div>
-            <div class="type">MOUNTAINS</div>
-            <div class="description">
-              Green Mountain is a common name for "The Peak", the highest point
-              and a stratovolcano on Ascension Island, which has gained some
-              fame for claims that it is one of very few large-scale artificial
-              forests. Green Mountain is ranked 38th by topographic isolation.
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Green_Mountain">SEE MORE</a>
-            </div>
-          </div>
+        <div class="nextPrevArrows">
+            <button class="prev">&lt;</button>
+            <button class="next">&gt;</button>
         </div>
-        <div class="item">
-          <img src="Images/mountains-7302806.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Peak-Mountains</div>
-            <div class="type">MOUNTAINS</div>
-            <div class="description">
-              A summit is a point on a surface that is higher in elevation than
-              all points immediately adjacent to it. The topographic terms acme,
-              apex, peak (mountain peak), and zenith are synonymous. The term
-              top (mountain top) is generally used only for a mountain peak that
-              is located at some distance from the nearest point of higher
-              elevation.
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/List_of_highest_mountains_on_Earth">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="item">
-          <img src="Images/railroad-163518_1920.jpg" alt="" />
-          <div class="content">
-            <div class="title">Rail-Road</div>
-            <div class="type">NATURE</div>
-            <div class="description">
-              railway track (British English and UIC terminology) or railroad track (American English), also known as a train track or permanent way (often "perway"[1] in Australia), is the structure on a railway or railroad consisting of the rails, fasteners, railroad ties (sleepers, British English) and ballast (or slab track), plus the underlying subgrade. It enables trains to move by providing a dependable surface for their wheels to roll upon.
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Rail_Road_Flat,_California">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <img src="Images/road-7504719.jpg" alt="" />
-          <div class="content">
-            <div class="title">Mountain-Roads</div>
-            <div class="type">MOUNTAINS</div>
-            <div class="description">
-              mountain pass is a navigable route through a mountain range or over a ridge. Since mountain ranges can present formidable barriers to travel, passes have played a key role in trade, war, and both human and animal migration throughout history. At lower elevations it may be called a hill pass. 
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/San_Gabriel_Dam">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <img src="Images/sea-7375377.jpg" alt="" />
-          <div class="content">
-            <div class="title">Sea</div>
-            <div class="type">NATURE</div>
-            <div class="description">
-              A sea is a large body of salty water. There are particular seas and the sea. The sea commonly refers to the ocean, the wider body of seawater. Particular seas are either marginal seas, second-order sections of the oceanic sea (e.g. the Mediterranean Sea), or certain large, nearly landlocked bodies of water.
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Sea">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <img src="Images/tree-832079_1920.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Tree</div>
-            <div class="type">NATURE</div>
-            <div class="description">
-              tree is a perennial plant with an elongated stem, or trunk, usually supporting branches and leaves. In some usages, the definition of a tree may be narrower, including only woody plants with secondary growth, plants that are usable as lumber or plants above a specified height. In wider definitions, the taller palms, tree ferns, bananas, and bamboos are also trees.
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Tree">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <img src="Images/tree-7739243.jpg" alt="" />
-
-          <div class="content">
-            <div class="title">Mountain-House</div>
-            <div class="type">MOUNTAINS</div>
-            <div class="description">
-              The Mountain House is a restaurant located in King's Mountain, Woodside, California. Initially established over a century ago hosting a variety of community roles, it has been featured in a plethora of music video clips by prominent artists mostly due to its unique location inside a redwood forest.
-
-            </div>
-            <div class="button">
-              <a href="https://en.wikipedia.org/wiki/Mountain_House">SEE MORE</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="thumbnail">
-        <div class="item">
-          <img src="Images/heliconia-8599119.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/hills-615429.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/mountain-7704596.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/mountains-6721870.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/mountains-7302806.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/railroad-163518_1920.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/road-7504719.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/sea-7375377.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/tree-832079_1920.jpg" alt="" />
-        </div>
-        <div class="item">
-          <img src="Images/tree-7739243.jpg" alt="" />
-        </div>
-      </div>
-
-      <div class="nextPrevArrows">
-        <button class="prev"><</button>
-        <button class="next">></button>
-      </div>
     </div>
-    <script src="app.js"></script>
-  </body>
+    <script>
+        let nextBtn = document.querySelector('.next');
+        let prevBtn = document.querySelector('.prev');
+
+        let slider = document.querySelector('.slider');
+        let sliderList = slider.querySelector('.slider .list');
+        let thumbnail = document.querySelector('.slider .thumbnail');
+        
+        // This line is important for the slider animation logic
+        if (thumbnail.children.length > 0) {
+            thumbnail.appendChild(thumbnail.children[0]);
+        }
+
+        // Function for next button
+        nextBtn.onclick = function () {
+            moveSlider('next');
+        }
+
+        // Function for prev button
+        prevBtn.onclick = function () {
+            moveSlider('prev');
+        }
+
+        function moveSlider(direction) {
+            let sliderItems = sliderList.querySelectorAll('.item');
+            let thumbnailItems = document.querySelectorAll('.thumbnail .item');
+
+            if (direction === 'next') {
+                sliderList.appendChild(sliderItems[0]);
+                if (thumbnailItems.length > 0) {
+                    thumbnail.appendChild(thumbnailItems[0]);
+                }
+                slider.classList.add('next');
+            } else {
+                sliderList.prepend(sliderItems[sliderItems.length - 1]);
+                if (thumbnailItems.length > 0) {
+                    thumbnail.prepend(thumbnailItems[thumbnailItems.length - 1]);
+                }
+                slider.classList.add('prev');
+            }
+
+            slider.addEventListener('animationend', function () {
+                if (direction === 'next') {
+                    slider.classList.remove('next');
+                } else {
+                    slider.classList.remove('prev');
+                }
+            }, { once: true });
+        }
+    </script>
+</body>
+
 </html>
+
